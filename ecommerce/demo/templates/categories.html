@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'demo:home' %}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Categories</li>
+        </ol>
+    </nav>
+    <h2>Categories:</h2>
+
+
+    {% for category in data %}
+        <ul>
+            <li><a href="{% url 'demo:product_by_category' category=category.slug %}">{{ category }}</a></li>
+        </ul>
+    {% endfor %}
+
+{% endblock content %}

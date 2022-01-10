@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'demo:home' %}">Home</a></li>
+            <li class="breadcrumb-item "><a href="{% url 'demo:categories' %}">Categories</a></li>
+            <li class="breadcrumb-item active"><a
+                    href="{% url 'demo:product_by_category'  current_category %}">{{ current_category }}</a></li>
+            <li class="breadcrumb-item active">{{ current_product.first }}</li>
+        </ol>
+    </nav>
+
+
+    <h2>Product detail: </h2>
+
+    <ul>
+        {% for product_data in data %}
+            <li><strong>Name: </strong>{{ product_data.product__name }}</li>
+            <li><strong>SKU: </strong>{{ product_data.sku }}</li>
+            <li><strong>In stock: </strong>{{ product_data.product_inventory__units }}</li>
+        {% endfor %}
+    </ul>
+
+    <ul>
+        {% for product in z %}
+            <li>
+                {{ product.product_attribute__name }}
+            <ul>
+                {% for product_attr in y %}
+                    {% if product_attr.attribute_values__product_attribute__name == product.product_attribute__name %}
+                        <li>{{ product_attr.attribute_values__attribute_value }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            </li>
+        {% endfor %}
+    </ul>
+
+
+
+{% endblock content %}

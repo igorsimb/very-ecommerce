@@ -1,0 +1,28 @@
+{% extends 'base.html'%}
+
+{% block content %}
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'demo:home' %}">Home</a></li>
+            <li class="breadcrumb-item "><a href="{% url 'demo:categories' %}">Categories</a></li>
+            <li class="breadcrumb-item active">{{ current_category }}</li>
+        </ol>
+    </nav>
+
+
+    <h2>Category: {{ current_category }}</h2>
+    {% for product in data %}
+        <ul>
+            <li><strong>Name: </strong><a href="{% url 'demo:product_detail' slug=product.slug %}">{{ product.name }}</a></li>
+            <li><strong>ID: </strong>{{ product.id }}</li>
+            <li><strong>Price: </strong>${{ product.product__store_price }}</li>
+        </ul>
+        <hr>
+    {% empty %}
+        No products in this category
+    {% endfor %}
+
+
+
+{% endblock content %}

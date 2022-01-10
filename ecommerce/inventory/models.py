@@ -5,23 +5,30 @@ from mptt.models import MPTTModel, TreeForeignKey, TreeManyToManyField
 
 class Category(MPTTModel):
     """
-    Inventory Category table implemented with MPTT
+    Inventory Category table implimented with MPTT
     """
+
     name = models.CharField(
         max_length=100,
         null=False,
         unique=False,
         blank=False,
         verbose_name=_("category name"),
-        help_text=_("format: required, max-100"))
+        help_text=_("format: required, max-100"),
+    )
     slug = models.SlugField(
         max_length=150,
         null=False,
         unique=False,
         blank=False,
         verbose_name=_("category safe URL"),
-        help_text=_("format: required, letters, numbers, underscore, or hyphens"))
-    is_active = models.BooleanField(default=True)
+        help_text=_(
+            "format: required, letters, numbers, underscore, or hyphens"
+        ),
+    )
+    is_active = models.BooleanField(
+        default=True,
+    )
 
     parent = TreeForeignKey(
         "self",
@@ -31,7 +38,7 @@ class Category(MPTTModel):
         blank=True,
         unique=False,
         verbose_name=_("parent of category"),
-        help_text=_("format: not required")
+        help_text=_("format: not required"),
     )
 
     class MPTTMeta:
@@ -49,13 +56,14 @@ class Product(models.Model):
     """
     Product details table
     """
+
     web_id = models.CharField(
         max_length=50,
         unique=True,
         null=False,
         blank=False,
         verbose_name=_("product website ID"),
-        help_text=_("format: required, unique")
+        help_text=_("format: required, unique"),
     )
     slug = models.SlugField(
         max_length=255,
@@ -106,24 +114,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-
-class ProductType(models.Model):
-    """
-    Product type table
-    """
-    name = models.CharField(
-        max_length=255,
-        unique=True,
-        null=False,
-        blank=False,
-        verbose_name=_("type of product"),
-        help_text=_("Format: required, unique, max-255")
-    )
-
-    def __str__(self):
-        return self.name
-
-
 class Brand(models.Model):
     """
     Product brand table
@@ -164,6 +154,29 @@ class ProductAttribute(models.Model):
         return self.name
 
 
+class ProductType(models.Model):
+    """
+    Product type table
+    """
+
+    name = models.CharField(
+        max_length=255,
+        unique=True,
+        null=False,
+        blank=False,
+        verbose_name=_("type of product"),
+        help_text=_("format: required, unique, max-255"),
+    )
+
+    product_type_attributes = models.ManyToManyField(
+        ProductAttribute,
+        related_name="product_type_attributes",
+        through="ProductTypeAttribute",
+    )
+
+    def __str__(self):
+        return self.name
+
 class ProductAttributeValue(models.Model):
     """
     Product attribute value table
@@ -183,14 +196,12 @@ class ProductAttributeValue(models.Model):
         help_text=_("format: required, max-255"),
     )
 
-    def __str__(self):
-        return f'{self.product_attribute.name} : {self.attribute_value}'
-
 
 class ProductInventory(models.Model):
     """
     Product inventory table
     """
+
     sku = models.CharField(
         max_length=20,
         unique=True,
@@ -295,30 +306,11 @@ class ProductInventory(models.Model):
         return self.product.name
 
 
-class ProductAttributeValues(models.Model):
-    """
-    Product attribute values link table
-    """
-
-    attributevalues = models.ForeignKey(
-        "ProductAttributeValue",
-        related_name="attributevalues",
-        on_delete=models.PROTECT,
-    )
-    productinventory = models.ForeignKey(
-        ProductInventory,
-        related_name="productattributevalues",
-        on_delete=models.PROTECT,
-    )
-
-    class Meta:
-        unique_together = (("attributevalues", "productinventory"),)
-
-
 class Media(models.Model):
     """
-    The product image table
+    The product image table.
     """
+
     product_inventory = models.ForeignKey(
         ProductInventory,
         on_delete=models.PROTECT,
@@ -392,3 +384,43 @@ class Stock(models.Model):
         verbose_name=_("units sold to date"),
         help_text=_("format: required, default-0"),
     )
+
+
+class ProductAttributeValues(models.Model):
+    """
+    Product attribute values link table
+    """
+
+    attributevalues = models.ForeignKey(
+        "ProductAttributeValue",
+        related_name="attributevaluess",
+        on_delete=models.PROTECT,
+    )
+    productinventory = models.ForeignKey(
+        ProductInventory,
+        related_name="productattributevaluess",
+        on_delete=models.PROTECT,
+    )
+
+    class Meta:
+        unique_together = (("attributevalues", "productinventory"),)
+
+
+class ProductTypeAttribute(models.Model):
+    """
+    Product type attributes link table
+    """
+
+    product_attribute = models.ForeignKey(
+        ProductAttribute,
+        related_name="productattribute",
+        on_delete=models.PROTECT,
+    )
+    product_type = models.ForeignKey(
+        ProductType,
+        related_name="producttype",
+        on_delete=models.PROTECT,
+    )
+
+    class Meta:
+        unique_together = (("product_attribute", "product_type"),)
